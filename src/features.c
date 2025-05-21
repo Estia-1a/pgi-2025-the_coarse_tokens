@@ -8,9 +8,23 @@
  * @brief Here, you have to code features of the project.
  * Do not forget to commit regurlarly your changes.
  * Your commit messages must contain "#n" with: n = number of the corresponding feature issue.
- * When the feature is totally implemented, your commit message must contain "close #n".
+ * When the feature is totally implemented, your commit message must contain "close #n".'
  */
 
 void helloWorld() {
     printf("Hello World !");
+}
+void dimension (char *source_path) {
+    int height ;
+    int width  ;
+    int channel_count ;
+    unsigned char *data ;
+   
+    int resultat = read_image_data (source_path, &data, &height, &width, &channel_count);
+    if(resultat) {
+    printf("dimension: %d, %d ", height, width);
+    }
+    else {
+     printf("erreur: ");
+    }
 }
