@@ -14,6 +14,18 @@
 void helloWorld() {
     printf("Hello World !");
 }
+
+
+void tenth_pixel (char *source_path){
+    int width, height, channel_count ;
+    unsigned char *data;   
+    channel_count = (9 * channel_count);
+
+
+    read_image_data (source_path, &data, &width, &height, &channel_count);
+    printf("tenth_pixel: %d, %d, %d" , data [9] , data[10] , data[11]);
+}
+    
 void dimension (char *source_path) {
     int height ;
     int width  ;
@@ -82,4 +94,11 @@ void print_pixel(char *source_path) {
         unsigned char a = data[index + 3];
         printf("A = %d\n", a);
     }
+}
+
+void second_line(char *source_path){
+    int width, height, channel_count;
+    unsigned char *data;
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+    printf("second_line: %d, %d, %d", data[3 * width], data[3 * width + 1],  data[3 * width + 2]);
 }
