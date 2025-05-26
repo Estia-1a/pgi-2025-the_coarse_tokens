@@ -18,12 +18,10 @@ void helloWorld() {
 
 void tenth_pixel (char *source_path){
     int width, height, channel_count ;
-    unsigned char *data;   
-    channel_count = (9 * channel_count);
-
-
+    unsigned char *data; 
+    
     read_image_data (source_path, &data, &width, &height, &channel_count);
-    printf("tenth_pixel: %d, %d, %d" , data [9] , data[10] , data[11]);
+    printf("tenth_pixel: %d, %d, %d" , data [27] , data[28] , data[29]);
 }
     
 void dimension (char *source_path) {
