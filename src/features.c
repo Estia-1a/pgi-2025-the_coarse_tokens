@@ -444,3 +444,9 @@ void color_invert(char *source_path) {
     }
     write_image_data("image_out.bmp", new_data, width, height);
 }  
+
+void rotate_cw(char *source_path) {
+}
+
+void rotate_acw(char *source_path) {
+}
