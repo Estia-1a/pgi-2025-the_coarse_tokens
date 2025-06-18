@@ -85,7 +85,7 @@ if (strncmp(configuration.command, "print_pixel", 14) == 0) {
     if (strncmp(configuration.command, "scale_crop", 21) == 0) {
   scale_crop(configuration.filenames[0],50,50,10,10);
   }
-     if (strncmp(configuration.command, "min_pixel", 17) == 0) {
+     if (strncmp(configuration.command, "min_pixel", 20) == 0) {
     min_pixel(configuration.filenames[0]);
   }
     if (strncmp(configuration.command, "rotate_cw", 9) == 0) {
@@ -107,5 +107,15 @@ if (strncmp(configuration.command, "print_pixel", 14) == 0) {
   if (strncmp(configuration.command, "mirror_total", 12) == 0) {
     mirror_total(configuration.filenames[0]);
   }
+  if (strncmp(configuration.command, "scale_nearest", 13) == 0) {
+    scale_nearest(configuration.filenames[0], atof(configuration.arguments[0]));
+  }
 
+   if (strncmp(configuration.command, "scale_bilinear", 14) == 0) {
+    scale_bilinear(configuration.filenames[0], atof(configuration.arguments[0]));
+  }
+
+  if (strncmp(configuration.command, "color_desaturate", 16) == 0) {
+    color_desaturate(configuration.filenames[0]);
+  }
 }
