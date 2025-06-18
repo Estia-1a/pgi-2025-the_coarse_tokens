@@ -4,6 +4,8 @@
 #include "features.h"
 #include "utils.h"
 #include <stdlib.h>
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 
 /**
  * @brief Here, you have to code features of the project.
@@ -45,54 +47,33 @@ void first_pixel(char *source_path) {
 
     int resultat1 = read_image_data (source_path, &data, &width, &height, &channel_count);
     if (resultat1) { 
-    printf("Image chargée : %d x %d, %d canaux\n", width, height, channel_count);
     unsigned char r = data[0];
     unsigned char g = data[1];
     unsigned char b = data[2];
-    printf("Couleur du premier pixel :\n");
-    printf("R = %d\n", r);
-    printf("G = %d\n", g);
-    printf("B = %d\n", b);
+    printf("first_pixel: %d, %d, %d", r, g, b);
     }
     else {
      printf("erreur: ");
     }  
 }
-void print_pixel(char *source_path) {
+void print_pixel(char *source_path, int x, int y) {
     int width, height, channel_count;
     unsigned char *data;
 
-    int resultat2 = read_image_data(source_path, &data, &width, &height, &channel_count);
-
-    if (!resultat2) {
-        printf("Erreur : impossible de lire l'image %s\n", source_path);
+    if (!read_image_data(source_path, &data, &width, &height, &channel_count)) {
+        fprintf(stderr, "Erreur : lecture de l'image echouee.\n");
         return;
     }
-    printf("Image chargée : %d x %d, %d canaux\n", width, height, channel_count);
-    int x, y;
-    printf("Entrez les coordonnées du pixel (x y) : ");
-    if (scanf("%d %d", &x, &y) != 2) {
-        printf("Erreur : saisie invalide\n");
-        return;
-    }
-    if (x < 0 || x >= width || y < 0 || y >= height) {
-        fprintf(stderr, "Erreur : position (%d, %d) hors de l'image (%d x %d)\n", x, y, width, height);
-        return;
-    }
-    int index = (y * width + x) * channel_count;
-    unsigned char r = data[index];
-    unsigned char g = data[index + 1];
-    unsigned char b = data[index + 2];
 
-    printf("Couleur du pixel à (%d, %d) :\n", x, y);
-    printf("R = %d\n", r);
-    printf("G = %d\n", g);
-    printf("B = %d\n", b);
-
-    if (channel_count == 4) {
-        unsigned char a = data[index + 3];
-        printf("A = %d\n", a);
+    pixelRGB *pixel = get_pixel(data, width, height, channel_count, x, y);
+    if (pixel) {
+        printf("print_pixel (%d, %d): %u, %u, %u\n", x, y, pixel->R, pixel->G, pixel->B);
+        free(pixel);
+    } else {
+        fprintf(stderr, "Erreur : coordonnees hors image.\n");
     }
+
+    free(data);
 }
 
 void second_line(char *source_path){
@@ -445,11 +426,14 @@ void color_invert(char *source_path) {
     write_image_data("image_out.bmp", new_data, width, height);
 }  
 
-void rotate_cw(char *source_path) {
+void rotate_acw(const char *input_path, const char *output_path) {
+
 }
 
-void rotate_acw(char *source_path) {
+void rotate_cw(const char *input_path, const char *output_path) {
 }
+
+
 
 void scale_crop(char *source_path) {
 }

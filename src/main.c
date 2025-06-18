@@ -48,11 +48,9 @@ int main(int argc, char **argv) {
     /* first_pixel() function is defined in feature.h and implemented in feature.c */
     first_pixel(configuration.filenames [0]);
   }
-  if ( strncmp( configuration.command, "print_pixel", 14 ) == 0 ) {
-    /* print_pixel() function is defined in feature.h and implemented in feature.c */
-    print_pixel(configuration.filenames [0]);
-  return 0;
-  }
+if (strncmp(configuration.command, "print_pixel", 14) == 0) {
+    print_pixel(configuration.filenames[0], atoi(configuration.arguments[0]), atoi(configuration.arguments[1]));
+}
   if ( strncmp( configuration.command, "second_line", 15 ) == 0 ) {
     second_line( configuration.filenames[0] );
   }
