@@ -251,12 +251,35 @@ void color_red(char *source_path){
     write_image_data("image_out.bmp", new_data, width, height);
 }
 
+<<<<<<< HEAD
 void stat_report(char *source_path) {
+=======
+void color_green(char *source_path){
+    int width, height, channel_count;
+    unsigned char *data;
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    unsigned char *new_data=(unsigned char*)malloc(width * height * channel_count * sizeof(unsigned char));
+    for (int y = 0; y < height; y++){
+        for (int x=0; x < width; x++){
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            unsigned char green = pixel->G;
+            new_data[(y * width + x) * channel_count] = 0;
+            new_data[(y * width + x) * channel_count + 1] = green;
+            new_data[(y * width + x) * channel_count + 2] = 0;
+        }
+    }
+    write_image_data("image_out.bmp", new_data, width, height);
+}
+
+void color_blue(char *source_path) {
+>>>>>>> 53543c52a57977c83214785340da607bd151678c
     int width, height, channel_count;
     unsigned char *data;
 
     read_image_data(source_path, &data, &width, &height, &channel_count);
 
+<<<<<<< HEAD
     // max_pixel et min_pixel
     int max_sum = -1, min_sum = 256 * 3;
     int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
@@ -347,3 +370,58 @@ void stat_report(char *source_path) {
 
     free_image_data(data);
 }
+=======
+    unsigned char *new_data = (unsigned char*)malloc(width * height * channel_count * sizeof(unsigned char));
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            unsigned char blue  = pixel->B ;
+            new_data[(y * width + x) * channel_count] = 0;
+            new_data[(y * width + x) * channel_count + 1] = 0 ;
+            new_data[(y * width + x) * channel_count + 2] = blue;
+        }
+    }
+    write_image_data("image_out.bmp", new_data, width, height);
+}
+
+void color_gray(char *source_path) {
+    int width, height, channel_count;
+    unsigned char *data;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    unsigned char *new_data = (unsigned char*)malloc(width * height * channel_count * sizeof(unsigned char));
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            unsigned char gray = (pixel->R + pixel->G + pixel->B) / 3;
+            new_data[(y * width + x) * channel_count] = gray;
+            new_data[(y * width + x) * channel_count + 1] = gray ;
+            new_data[(y * width + x) * channel_count + 2] = gray;
+        }
+    }
+    write_image_data("image_out.bmp", new_data, width, height);
+}
+
+void color_gray_luminance(char *source_path) {
+    int width, height, channel_count;
+    unsigned char *data;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    unsigned char *new_data = (unsigned char*)malloc(width * height * channel_count * sizeof(unsigned char));
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            unsigned char value = 0.21 * pixel->R + 0.72 * pixel->G + 0.07 * pixel->B;
+            new_data[(y * width + x) * channel_count] = value;
+            new_data[(y * width + x) * channel_count + 1] =value;
+            new_data[(y * width + x) * channel_count + 2] = value ; 
+        }
+    }
+    write_image_data("image_out.bmp", new_data, width, height);
+} 
+>>>>>>> 53543c52a57977c83214785340da607bd151678c
