@@ -450,3 +450,6 @@ void rotate_cw(char *source_path) {
 
 void rotate_acw(char *source_path) {
 }
+
+void scale_crop(char *source_path) {
+}
