@@ -467,3 +467,4 @@ void rotate_acw(const char *input_path, const char *output_path) {
 
 void rotate_cw(const char *input_path, const char *output_path) {
 }
+
