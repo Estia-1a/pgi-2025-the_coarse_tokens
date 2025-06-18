@@ -40,11 +40,11 @@ int main(int argc, char **argv) {
   }
  
 
-   if ( strncmp( configuration.command, "dimension", 9 ) == 0 ) {
+   if ( strncmp( configuration.command, "dimension", 12 ) == 0 ) {
     /* dimenson() function is defined in feature.h and implemented in feature.c */
     dimension(configuration.filenames[0]);
   }
-  if ( strncmp( configuration.command, "first_pixel", 11 ) == 0 ) {
+  if ( strncmp( configuration.command, "first_pixel", 13 ) == 0 ) {
     /* first_pixel() function is defined in feature.h and implemented in feature.c */
     first_pixel(configuration.filenames [0]);
   }
@@ -53,22 +53,16 @@ int main(int argc, char **argv) {
     print_pixel(configuration.filenames [0]);
   return 0;
   }
-  if ( strncmp( configuration.command, "second_line", 12 ) == 0 ) {
+  if ( strncmp( configuration.command, "second_line", 15 ) == 0 ) {
     second_line( configuration.filenames[0] );
   }
-  if (strncmp(configuration.command, "min_pixel", 9) == 0) {
-    min_pixel(configuration.filenames [0]);
-  }
-  if (strncmp(configuration.command, "color_red", 9)==0) {
-    color_red(configuration.filenames[0]);
-  }
-   if (strncmp(configuration.command, "max_component", 13) == 0) {
+   if (strncmp(configuration.command, "max_component", 16) == 0) {
     max_component(configuration.filenames[0], configuration.arguments[0][0]);
   }
-   if (strncmp(configuration.command, "max_pixel", 9) == 0) {
+   if (strncmp(configuration.command, "max_pixel", 17) == 0) {
     max_pixel(configuration.filenames[0]);
   }
-   if (strncmp(configuration.command, "min_component", 13) == 0) {
+   if (strncmp(configuration.command, "min_component", 18) == 0) {
     min_component(configuration.filenames[0], configuration.arguments[0][0]);
   }
   
