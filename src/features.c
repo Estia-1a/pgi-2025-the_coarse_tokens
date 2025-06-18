@@ -101,6 +101,38 @@ void second_line(char *source_path){
     read_image_data(source_path, &data, &width, &height, &channel_count);
     printf("second_line: %d, %d, %d", data[3 * width], data[3 * width + 1],  data[3 * width + 2]);
 }
+void max_pixel(char *source_path) {
+    int width, height, channel_count;
+    unsigned char *data;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    int max_sum = -1;
+    int max_x = 0, max_y = 0;
+    pixelRGB max_pixel = {0, 0, 0};
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            if (pixel == NULL) continue;
+
+            int sum = pixel->R + pixel->G + pixel->B;
+
+            if (sum > max_sum) {
+                max_sum = sum;
+                max_x = x;
+                max_y = y;
+                max_pixel = *pixel;
+            }
+
+            free(pixel); 
+        }
+    }
+
+    printf("max_pixel (%d, %d): %d, %d, %d\n", max_x, max_y, max_pixel.R, max_pixel.G, max_pixel.B);
+
+    free(data); 
+}
 
 void min_pixel(char *source_path) {
     int width, height, channel_count;
@@ -109,7 +141,7 @@ void min_pixel(char *source_path) {
     read_image_data(source_path, &data, &width, &height, &channel_count);
 
     int min_sum = 256*3;
-    int min_x = 0, max_y = 0;
+    int min_x = 0, min_y = 0;
     pixelRGB min_pixel = {255, 255, 255};
 
     for (int y = 0; y < height; y++) {
@@ -126,13 +158,80 @@ void min_pixel(char *source_path) {
                 min_pixel = *pixel;
             }
 
-            free(pixel); // libère chaque pixel alloué
+            free(pixel); 
         }
     }
 
-    printf("max_pixel (%d, %d): %d, %d, %d\n", min_x, min_y, min_pixel.R, min_pixel.G, min_pixel.B);
+    printf("min_pixel (%d, %d): %d, %d, %d\n", min_x, min_y, min_pixel.R, min_pixel.G, min_pixel.B);
 
-    free(data); // libère l'image complète
+    free(data); 
+}
+
+void max_component(char *source_path, char component) {
+    int width, height, channel_count;
+    unsigned char *data;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+ 
+    int max_value = -1; 
+    int max_x_component = 0, max_y_component = 0 ;
+
+    for (int y = 0; y < height ; y++ ) { 
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            int value ;
+
+            if (component == 'R'){
+                value = pixel->R;
+            } else if (component == 'G') { 
+                value = pixel->G;
+            } else {
+                value = pixel->B;
+            }
+
+            if (value > max_value) { 
+                max_value = value;
+                max_x_component=x; 
+                max_y_component=y;  
+            }
+        }
+
+    }
+    printf("max_component %c ( %d, %d ): %d", component, max_x_component , max_y_component , max_value);
+}
+void min_component(char *source_path, char component) {
+    int width, height, channel_count;
+    unsigned char *data;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+ 
+    int min_value = 256 ; 
+    int min_x_component = 0, min_y_component = 0 ;
+
+    for (int y = 0; y < height ; y++ ) { 
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            int value ;
+
+            if (component == 'R'){
+                value = pixel->R;
+            } else if (component == 'G') { 
+                value = pixel->G;
+            } else {
+                value = pixel->B;
+            }
+
+            if (value < min_value) { 
+                min_value = value;
+                min_x_component=x; 
+                min_y_component=y;  
+            }
+        }
+
+    }
+    printf("min_component %c ( %d, %d ): %d", component, min_x_component , min_y_component , min_value);
+}
+
 
 void color_red(char *source_path){
     int width, height, channel_count;
@@ -150,6 +249,4 @@ void color_red(char *source_path){
         }
     }
     write_image_data("image_out.bmp", new_data, width, height);
-}
-
 }
