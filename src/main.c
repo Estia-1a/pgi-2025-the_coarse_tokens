@@ -32,14 +32,11 @@ int main(int argc, char **argv) {
     helloWorld();
   }
 
-
-
   if ( strncmp( configuration.command, "tenth_pixel", 11 ) == 0 ) {
     tenth_pixel(configuration.filenames[0]);
 
   }
  
-
    if ( strncmp( configuration.command, "dimension", 12 ) == 0 ) {
     /* dimenson() function is defined in feature.h and implemented in feature.c */
     dimension(configuration.filenames[0]);
@@ -87,5 +84,15 @@ if (strncmp(configuration.command, "print_pixel", 14) == 0) {
   }
     if (strncmp(configuration.command, "scale_crop", 21) == 0) {
   scale_crop(configuration.filenames[0],50,50,10,10);
+  }
+     if (strncmp(configuration.command, "min_pixel", 17) == 0) {
+    min_pixel(configuration.filenames[0]);
+  }
+    if (strncmp(configuration.command, "rotate_cw", 9) == 0) {
+    rotate_cw(configuration.filenames[0]);
+  }
+
+  if (strncmp(configuration.command, "rotate_acw", 10) == 0) {
+    rotate_acw(configuration.filenames[0]);
   }
 }
