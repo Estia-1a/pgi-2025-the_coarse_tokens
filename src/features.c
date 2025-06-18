@@ -3,6 +3,7 @@
 
 #include "features.h"
 #include "utils.h"
+#include <stdlib.h>
 
 /**
  * @brief Here, you have to code features of the project.
@@ -19,7 +20,7 @@ void helloWorld() {
 void tenth_pixel (char *source_path){
     int width, height, channel_count ;
     unsigned char *data; 
-    
+
     read_image_data (source_path, &data, &width, &height, &channel_count);
     printf("tenth_pixel: %d, %d, %d" , data [27] , data[28] , data[29]);
 }
@@ -99,4 +100,56 @@ void second_line(char *source_path){
     unsigned char *data;
     read_image_data(source_path, &data, &width, &height, &channel_count);
     printf("second_line: %d, %d, %d", data[3 * width], data[3 * width + 1],  data[3 * width + 2]);
+}
+
+void min_pixel(char *source_path) {
+    int width, height, channel_count;
+    unsigned char *data;
+
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    int min_sum = 256*3;
+    int min_x = 0, max_y = 0;
+    pixelRGB min_pixel = {255, 255, 255};
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            if (pixel == NULL) continue;
+
+            int sum = pixel->R + pixel->G + pixel->B;
+
+            if (sum < min_sum) {
+                min_sum = sum;
+                min_x = x;
+                min_y = y;
+                min_pixel = *pixel;
+            }
+
+            free(pixel); // libère chaque pixel alloué
+        }
+    }
+
+    printf("max_pixel (%d, %d): %d, %d, %d\n", min_x, min_y, min_pixel.R, min_pixel.G, min_pixel.B);
+
+    free(data); // libère l'image complète
+
+void color_red(char *source_path){
+    int width, height, channel_count;
+    unsigned char *data;
+    read_image_data(source_path, &data, &width, &height, &channel_count);
+
+    unsigned char *new_data=(unsigned char*)malloc(width * height * channel_count * sizeof(unsigned char));
+    for (int y = 0; y < height; y++){
+        for (int x=0; x < width; x++){
+            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
+            unsigned char red = pixel->R;
+            new_data[(y * width + x) * channel_count] = red;
+            new_data[(y * width + x) * channel_count + 1] = 0;
+            new_data[(y * width + x) * channel_count + 2] = 0;
+        }
+    }
+    write_image_data("image_out.bmp", new_data, width, height);
+}
+
 }
