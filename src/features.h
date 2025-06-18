@@ -21,6 +21,7 @@ void max_component(char *source_path, char component);
 void min_component(char *source_path, char component);
 
 void stat_report(char *source_path);
+
 void color_green(char *source_path);
 
 void color_red(char *source_path);
@@ -33,5 +34,6 @@ void color_gray_luminance(char *source_path);
 
 void color_invert(char *source_path);
 
+void scale_crop(char *source_path, int center_x, int center_y, int crop_w, int crop_h);
 
 #endif

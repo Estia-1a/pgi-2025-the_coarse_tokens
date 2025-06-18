@@ -87,9 +87,7 @@ int main(int argc, char **argv) {
   if (strncmp(configuration.command, "color_invert", 12) == 0) {
     color_invert(configuration.filenames[0]);
   }
-return 0;
+    if (strncmp(configuration.command, "scale_crop", 21) == 0) {
+  scale_crop(configuration.filenames[0],50,50,10,10);
+  }
 }
-
-
-
-

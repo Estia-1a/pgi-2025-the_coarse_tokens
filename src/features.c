@@ -1,6 +1,7 @@
 #include <estia-image.h>
 #include <stdio.h>
 
+#include <string.h>
 #include "features.h"
 #include "utils.h"
 #include <stdlib.h>
@@ -445,11 +446,38 @@ void color_invert(char *source_path) {
     write_image_data("image_out.bmp", new_data, width, height);
 }  
 
-void rotate_cw(char *source_path) {
-}
+void scale_crop(char *source_path, int center_x, int center_y, int crop_w, int crop_h) {
+    unsigned char *data = NULL;
+    int width, height, channels;
 
-void rotate_acw(char *source_path) {
-}
+    if (read_image_data(source_path, &data, &width, &height, &channels) != 0) {
+        fprintf(stderr, "Failed to load image.\n");
+        return;
+    }
 
-void scale_crop(char *source_path) {
+    int start_x = center_x - crop_w / 2;
+    int start_y = center_y - crop_h / 2;
+    if (start_x < 0) start_x = 0;
+    if (start_y < 0) start_y = 0;
+    if (start_x + crop_w > width) crop_w = width - start_x;
+    if (start_y + crop_h > height) crop_h = height - start_y;
+
+    unsigned char *cropped_data = malloc(crop_w * crop_h * channels);
+    if (!cropped_data) {
+        fprintf(stderr, "Failed to allocate memory.\n");
+        free(data);
+        return;
+    }
+
+    for (int y = 0; y < crop_h; y++) {
+        memcpy(
+            &cropped_data[y * crop_w * channels],
+            &data[((start_y + y) * width + start_x) * channels],
+            crop_w * channels
+        );
+    }
+
+    if (write_image_data("image_out1.bmp", cropped_data, crop_w, crop_h) != 0) {
+        fprintf(stderr, "Failed to write output image.\n");
+    }
 }
