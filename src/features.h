@@ -52,5 +52,4 @@ void scale_bilinear(char *source_path, float scale);
 
 void color_desaturate(char *source_path);
 
-
 #endif

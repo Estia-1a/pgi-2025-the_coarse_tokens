@@ -418,42 +418,6 @@ void color_invert(char *source_path) {
     write_image_data("image_out.bmp", new_data, width, height);
 }  
 
-void scale_crop(char *source_path, int center_x, int center_y, int crop_w, int crop_h) {
-    unsigned char *data = NULL;
-    int width, height, channels;
-
-    if (read_image_data(source_path, &data, &width, &height, &channels) != 0) {
-        fprintf(stderr, "Failed to load image.\n");
-        return;
-    }
-
-    int start_x = center_x - crop_w / 2;
-    int start_y = center_y - crop_h / 2;
-    if (start_x < 0) start_x = 0;
-    if (start_y < 0) start_y = 0;
-    if (start_x + crop_w > width) crop_w = width - start_x;
-    if (start_y + crop_h > height) crop_h = height - start_y;
-
-    unsigned char *cropped_data = malloc(crop_w * crop_h * channels);
-    if (!cropped_data) {
-        fprintf(stderr, "Failed to allocate memory.\n");
-        free(data);
-        return;
-    }
-
-    for (int y = 0; y < crop_h; y++) {
-        memcpy(
-            &cropped_data[y * crop_w * channels],
-            &data[((start_y + y) * width + start_x) * channels],
-            crop_w * channels
-        );
-    }
-
-    if (write_image_data("image_out1.bmp", cropped_data, crop_w, crop_h) != 0) {
-        fprintf(stderr, "Failed to write output image.\n");
-    }
-}
-
 void rotate_acw(char *source_path) {
     int width, height, channels;
     unsigned char *data = NULL;
@@ -598,98 +562,183 @@ void mirror_total(char *source_path) {
     free(new_data);
     free_image_data(data);
 }
+
 void scale_nearest(char *source_path, float scale) {
-    int original_width, original_height, channel_count;
-    unsigned char *data;
-
-    read_image_data(source_path, &data, &original_width, &original_height, &channel_count);
-
-    int new_width = (int)(original_width * scale);
-    int new_height = (int)(original_height * scale);
-
-    unsigned char *new_data = (unsigned char*)malloc(new_width * new_height * channel_count * sizeof(unsigned char));
-
+    int width, height, channels;
+    unsigned char *data = NULL;
+ 
+    if (!read_image_data(source_path, &data, &width, &height, &channels)) {
+        fprintf(stderr, "Erreur : lecture de l'image échouée.\n");
+        return;
+    }
+ 
+    int new_width = (int)(width * scale);
+    int new_height = (int)(height * scale);
+    unsigned char *scaled_data = malloc(new_width * new_height * channels);
+ 
+    if (!scaled_data) {
+        fprintf(stderr, "Erreur : mémoire insuffisante.\n");
+        free(data);
+        return;
+    }
+ 
     for (int y = 0; y < new_height; y++) {
-        int nearest_y = (int)(y / scale);
         for (int x = 0; x < new_width; x++) {
-            int nearest_x = (int)(x / scale);
-            for (int c = 0; c < channel_count; c++) {
-                new_data[(y * new_width + x) * channel_count + c] = data[(nearest_y * original_width + nearest_x) * channel_count + c];
+            int src_x = (int)(x / scale + 0.5f);
+            int src_y = (int)(y / scale + 0.5f);
+ 
+            if (src_x >= width) src_x = width - 1;
+            if (src_y >= height) src_y = height - 1;
+ 
+            for (int c = 0; c < channels; c++) {
+                int dest_index = (y * new_width + x) * channels + c;
+                int src_index = (src_y * width + src_x) * channels + c;
+                scaled_data[dest_index] = data[src_index];
             }
         }
     }
-
-    write_image_data("image_out.bmp", new_data, new_width, new_height);
-    free(new_data);
-    free_image_data(data);
+ 
+    if (write_image_data("image_out.bmp", scaled_data, new_width, new_height) != 0) {
+        fprintf(stderr, "Erreur : écriture de l'image échouée.\n");
+    }
+ 
+    free(data);
+    free(scaled_data);
 }
-
+float lerp(float a, float b, float t) {
+    return a + t * (b - a);
+}
+ 
 void scale_bilinear(char *source_path, float scale) {
-    int original_width, original_height, channel_count;
-    unsigned char *data;
-
-    read_image_data(source_path, &data, &original_width, &original_height, &channel_count);
-
-    int new_width = original_width * scale;
-    int new_height = original_height * scale;
-
-    unsigned char *new_data = (unsigned char*)malloc(new_width * new_height * channel_count * sizeof(unsigned char));
-
+    int width, height, channels;
+    unsigned char *data = NULL;
+ 
+    if (!read_image_data(source_path, &data, &width, &height, &channels)) {
+        fprintf(stderr, "Erreur : lecture de l'image échouée.\n");
+        return;
+    }
+ 
+    int new_width = (int)(width * scale);
+    int new_height = (int)(height * scale);
+    unsigned char *scaled_data = malloc(new_width * new_height * channels);
+ 
+    if (!scaled_data) {
+        fprintf(stderr, "Erreur : mémoire insuffisante.\n");
+        free(data);
+        return;
+    }
+ 
     for (int y = 0; y < new_height; y++) {
-        float gy = (y/ (new_height - 1)) * (original_height - 1);
-        int gyi = gy;
-        int gyi1 = gyi + 1 < original_height ? gyi + 1 : gyi;
-
         for (int x = 0; x < new_width; x++) {
-            float gx = (x / (new_width - 1)) * (original_width - 1);
-            int gxi = gx;
-            int gxi1 = gxi + 1 < original_width ? gxi + 1 : gxi;
-
-            for (int c = 0; c < channel_count; c++) {
-            
-                float c00 = data[(gyi * original_width + gxi) * channel_count + c];
-                float c10 = data[(gyi * original_width + gxi1) * channel_count + c];
-                float c01 = data[(gyi1 * original_width + gxi) * channel_count + c];
-                float c11 = data[(gyi1 * original_width + gxi1) * channel_count + c];
-
-                float wx = gx - gxi;
-                float wy = gy - gyi;
-
-                float value = c00 * (1 - wx) * (1 - wy) +
-                              c10 * wx * (1 - wy) +
-                              c01 * (1 - wx) * wy +
-                              c11 * wx * wy;
-
-                new_data[(y * new_width + x) * channel_count + c] = value;
+            float src_x = x / scale;
+            float src_y = y / scale;
+ 
+            int x1 = (int)src_x;
+            int y1 = (int)src_y;
+            int x2 = x1 + 1;
+            int y2 = y1 + 1;
+ 
+            float dx = src_x - x1;
+            float dy = src_y - y1;
+ 
+            if (x1 >= width) x1 = width - 1;
+            if (x2 >= width) x2 = width - 1;
+            if (y1 >= height) y1 = height - 1;
+            if (y2 >= height) y2 = height - 1;
+ 
+            for (int c = 0; c < channels; c++) {
+                float Q11 = data[(y1 * width + x1) * channels + c];
+                float Q12 = data[(y1 * width + x2) * channels + c];
+                float Q21 = data[(y2 * width + x1) * channels + c];
+                float Q22 = data[(y2 * width + x2) * channels + c];
+ 
+                float R1 = lerp(Q11, Q12, dx);
+                float R2 = lerp(Q21, Q22, dx);
+                float P = lerp(R1, R2, dy);
+ 
+                scaled_data[(y * new_width + x) * channels + c] = (unsigned char)(P + 0.5f);
             }
         }
     }
-    write_image_data("image_out.bmp", new_data, new_width, new_height);
-    free(new_data);
-    free_image_data(data);
+ 
+    if (write_image_data("image_out.bmp", scaled_data, new_width, new_height) != 0) {
+        fprintf(stderr, "Erreur : écriture de l'image échouée.\n");
+    }
+ 
+    free(data);
+    free(scaled_data);
 }
+ 
 void color_desaturate(char *source_path) {
-    int width, height, channel_count;
+    int width, height, channels;
+    unsigned char *data = NULL;
+ 
+    if (!read_image_data(source_path, &data, &width, &height, &channels)) {
+        fprintf(stderr, "Erreur : lecture de l'image echouee.\n");
+        return;
+    }
+ 
+    int size = width * height * channels;
+    for (int i = 0; i < size; i += channels) {
+        unsigned char r = data[i];
+        unsigned char g = data[i + 1];
+        unsigned char b = data[i + 2];
+ 
+        unsigned char min_val = r < g ? (r < b ? r : b) : (g < b ? g : b);
+        unsigned char max_val = r > g ? (r > b ? r : b) : (g > b ? g : b);
+        unsigned char desaturated = (min_val + max_val) / 2;
+ 
+        data[i]     = desaturated;
+        data[i + 1] = desaturated;
+        data[i + 2] = desaturated;
+    }
+ 
+    if (write_image_data("image_out.bmp", data, width, height) != 0) {
+        fprintf(stderr, "Erreur : ecriture de l'image echouee.\n");
+    }
+ 
+    free(data);
+}
+void scale_crop(char *source_path, int center_x, int center_y, int width, int height) {
+    int original_width, original_height, channel_count;
     unsigned char *data;
-
-    read_image_data(source_path, &data, &width, &height, &channel_count);
-
+ 
+    read_image_data(source_path, &data, &original_width, &original_height, &channel_count);
+ 
+    int x_start = center_x - width / 2;
+    int y_start = center_y - height / 2;
+ 
+    if (x_start < 0) {
+        x_start = 0;
+    } else if (x_start + width > original_width) {
+        x_start = original_width - width;
+    }
+ 
+    if (y_start < 0) {
+        y_start = 0;
+    } else if (y_start + height > original_height) {
+        y_start = original_height - height;
+    }
+ 
     unsigned char *new_data = (unsigned char*)malloc(width * height * channel_count * sizeof(unsigned char));
-
+ 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            pixelRGB* pixel = get_pixel(data, width, height, channel_count, x, y);
-
+            int new_x = x_start + x;
+            int new_y = y_start + y;
+ 
+            pixelRGB *pixel = get_pixel(data, original_width, original_height, channel_count, new_x, new_y);
             unsigned char R = pixel->R;
             unsigned char G = pixel->G;
             unsigned char B = pixel->B;
-
-             unsigned char value = (R+G +B) / 3;
-
-            new_data[(y * width + x) * channel_count] = value;
-            new_data[(y * width + x) * channel_count + 1] =value;
-            new_data[(y * width + x) * channel_count + 2] = value ; 
+ 
+            new_data[(y * width + x) * channel_count] = R;
+            new_data[(y * width + x) * channel_count + 1] = G;
+            new_data[(y * width + x) * channel_count + 2] = B;
         }
     }
     write_image_data("image_out.bmp", new_data, width, height);
-} 
+    free(new_data);
+    free_image_data(data);
+}
+ 
