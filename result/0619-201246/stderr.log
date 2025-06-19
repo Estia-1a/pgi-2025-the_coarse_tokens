@@ -1,0 +1,5 @@
+/home/runner/work/pgi-2025-the_coarse_tokens/pgi-2025-the_coarse_tokens/src/main.c: In function ‘main’:
+/home/runner/work/pgi-2025-the_coarse_tokens/pgi-2025-the_coarse_tokens/src/main.c:89:5: warning: implicit declaration of function ‘min_pixel’; did you mean ‘max_pixel’? [-Wimplicit-function-declaration]
+   89 |     min_pixel(configuration.filenames[0]);
+      |     ^~~~~~~~~
+      |     max_pixel
