@@ -34,7 +34,7 @@ void color_gray_luminance(char *source_path);
 
 void color_invert(char *source_path);
 
-void scale_crop(char *source_path, int center_x, int center_y, int crop_w, int crop_h);
+void scale_crop(char *source_path, int center_x, int center_y, int width, int height);
 
 void rotate_cw(char *source_path);
 
